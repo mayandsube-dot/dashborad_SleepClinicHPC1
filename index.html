@@ -88,6 +88,25 @@ html:has(#editDialog[open]){overflow:hidden;scrollbar-gutter:stable}
  #editDialog .form-section{padding:12px;margin:12px 0 16px;min-width:0}
 }
 @media(max-width:600px){#editDialog .form-grid{grid-template-columns:minmax(0,1fr)}}
+
+/* Full-screen form surfaces: the dashboard never shows behind a mobile form. */
+@media(max-width:1024px){
+ html:has(#loginDialog[open]),html:has(#editDialog[open]){overflow:hidden;scrollbar-gutter:auto}
+ body:has(#loginDialog[open]),body:has(#editDialog[open]){overflow:hidden;background:#fff;overscroll-behavior:none}
+ body:has(#loginDialog[open])>.topbar,body:has(#loginDialog[open])>.shell,
+ body:has(#editDialog[open])>.topbar,body:has(#editDialog[open])>.shell{visibility:hidden}
+ #loginDialog,#editDialog{position:fixed;inset:auto;top:var(--form-top,0px);left:var(--form-left,0px);right:auto;bottom:auto;width:var(--form-width,100vw);max-width:none;height:var(--form-height,100dvh);max-height:var(--form-height,100dvh);margin:0;border:0;border-radius:0;box-shadow:none;overflow:hidden;background:#fff}
+ #loginDialog::backdrop,#editDialog::backdrop{background:#fff;backdrop-filter:none}
+ #loginForm,#editForm{height:100%;max-height:100%;min-height:0;min-width:0;display:flex;flex-direction:column;overflow:hidden}
+ #loginDialog .dialog-head,#editDialog .dialog-head{flex:none;padding:max(12px,env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) 12px max(16px,env(safe-area-inset-left))}
+ #loginDialog .dialog-body,#editDialog .dialog-body{flex:1 1 0;min-height:0;min-width:0;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;overflow-anchor:none;scroll-behavior:auto;-webkit-overflow-scrolling:touch;padding:16px max(16px,env(safe-area-inset-right)) 16px max(16px,env(safe-area-inset-left))}
+ #loginDialog .dialog-body{display:flex;flex-direction:column;gap:16px;justify-content:flex-start}
+ #loginDialog .dialog-foot,#editDialog .dialog-foot{flex:none;padding:12px max(16px,env(safe-area-inset-right)) max(12px,env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left));background:#fff7fb}
+ #loginDialog .dialog-foot button{width:100%;min-height:48px}
+ #loginDialog .dialog-head button,#editDialog .dialog-head button{min-width:44px;min-height:44px}
+ #loginDialog input,#loginDialog select,#loginDialog textarea{font-size:16px;min-height:48px;max-width:100%}
+ #loginDialog .dialog-head h2,#editDialog .dialog-head h2{outline:none}
+}
 </style>
 </head>
 <body>
@@ -104,7 +123,7 @@ html:has(#editDialog[open]){overflow:hidden;scrollbar-gutter:stable}
 </main>
 <dialog id="cpapDialog"><form id="cpapForm"><div class="dialog-head"><h2>ใบสั่งซื้อเครื่อง CPAP</h2><button type="button" data-close="cpapDialog" aria-label="ปิด">×</button></div><div class="dialog-body"><p class="hint">ข้อมูลจากทะเบียน Google Sheet · แก้ไขหรือเว้นว่างได้ · เอกสารสร้างบนเครื่องนี้โดยไม่ส่งเข้า Google Drive</p><div class="cpap-layout"><div class="cpap-editor"><h3>ข้อมูลผู้รับบริการ</h3><div id="cpapFields" class="form-grid"></div><details><summary>แก้ไข / ลบข้อความส่วนอื่นในเอกสาร</summary><p class="hint">แก้ข้อความได้ทุกย่อหน้า หากแก้ช่องข้อมูลด้านบนภายหลัง ระบบจะเติมย่อหน้าที่เกี่ยวข้องใหม่</p><div id="cpapTextEditor" class="stack"></div></details></div><div class="cpap-preview-panel"><p id="cpapPreviewStatus" role="status"></p><p class="hint">ตัวอย่างอาจต่างจาก Word ตามฟอนต์บนเครื่อง · ใช้ฟอนต์ TH SarabunPSK ตามต้นฉบับ · ตรวจจำนวนหน้าก่อนพิมพ์</p><div id="cpapPreview" aria-label="ตัวอย่างใบสั่งซื้อ"></div></div></div><p id="cpapError" class="error" role="alert"></p></div><div class="dialog-foot"><button type="button" id="cpapPdf">พิมพ์ / บันทึก PDF ลง PC</button><button type="button" id="cpapWord" class="primary">ดาวน์โหลด Word (.docx) ลง PC</button></div></form></dialog>
 <dialog id="settingsDialog" class="narrow"><form id="settingsForm"><div class="dialog-head"><h2>เชื่อมต่อข้อมูลคลินิก</h2><button type="button" data-close="settingsDialog" aria-label="ปิด">×</button></div><div class="dialog-body stack"><label>Google Apps Script Web App URL<input id="urlInput" type="url" placeholder="https://script.google.com/macros/s/…/exec" required></label><p class="hint">ใช้ URL ที่ลงท้ายด้วย /exec หลัง Deploy เป็น Web app การตั้งค่านี้จะจำเฉพาะ URL บนอุปกรณ์นี้</p><p id="settingsError" class="error" role="alert"></p></div><div class="dialog-foot"><button class="primary" type="submit">บันทึกและเชื่อมต่อ</button></div></form></dialog>
-<dialog id="loginDialog" class="narrow"><form id="loginForm"><div class="dialog-head"><h2>เข้าสู่ระบบเจ้าหน้าที่</h2><button type="button" data-close="loginDialog" aria-label="ปิด">×</button></div><div class="dialog-body stack"><label>ชื่อผู้ใช้<input name="username" autocomplete="username" required></label><label>รหัสผ่าน<input name="password" type="password" autocomplete="current-password" required></label><p class="hint">กรุณาเข้าสู่ระบบเพื่อดูและจัดการข้อมูลผู้รับบริการ</p><p id="loginError" class="error" role="alert"></p></div><div class="dialog-foot"><button class="primary" id="submitLogin">เข้าสู่ระบบ</button></div></form></dialog>
+<dialog id="loginDialog" class="narrow"><form id="loginForm"><div class="dialog-head"><h2 id="loginTitle" tabindex="-1" autofocus>เข้าสู่ระบบเจ้าหน้าที่</h2><button type="button" data-close="loginDialog" aria-label="ปิด">×</button></div><div class="dialog-body stack"><label>ชื่อผู้ใช้<input name="username" autocomplete="username" required></label><label>รหัสผ่าน<input name="password" type="password" autocomplete="current-password" required></label><p class="hint">กรุณาเข้าสู่ระบบเพื่อดูและจัดการข้อมูลผู้รับบริการ</p><p id="loginError" class="error" role="alert"></p></div><div class="dialog-foot"><button class="primary" id="submitLogin">เข้าสู่ระบบ</button></div></form></dialog>
 <dialog id="editDialog"><form id="editForm"><div class="dialog-head"><h2 id="editTitle" tabindex="-1" autofocus>เพิ่มข้อมูลผู้รับบริการ</h2><button type="button" data-close="editDialog" aria-label="ปิด">×</button></div><div class="dialog-body"><p class="hint">* จำเป็นต้องระบุ · วันที่ใช้ปี ค.ศ. · ช่องว่างหมายถึงยังไม่มีข้อมูล</p><div id="formFields"></div><p id="editError" class="error" role="alert"></p></div><div class="dialog-foot"><button type="button" data-close="editDialog">ยกเลิก</button><button id="saveBtn" class="primary">บันทึกข้อมูล</button></div></form></dialog>
 <dialog id="detailDialog"><div class="dialog-head"><h2>รายละเอียดผู้รับบริการ</h2><button data-close="detailDialog" aria-label="ปิด">×</button></div><div class="dialog-body" id="detailBody"></div></dialog>
 <dialog id="deleteDialog" class="narrow"><div class="dialog-head"><h2>ยืนยันการลบข้อมูล</h2><button data-close="deleteDialog" aria-label="ปิด">×</button></div><div class="dialog-body"><p id="deleteName"></p><p class="hint">รายการนี้จะถูกลบออกจากชีต Sleep Clinic</p><p id="deleteError" class="error" role="alert"></p></div><div class="dialog-foot"><button data-close="deleteDialog">ยกเลิก</button><button id="confirmDelete" class="danger">ลบข้อมูล</button></div></dialog>
@@ -305,15 +324,18 @@ function updateBmi(){
 
 let editViewportFrame=0;
 function syncEditViewport(){
-  const dialog=$('editDialog');if(!dialog.open||!dialog.style)return;
-  const view=window.visualViewport,height=view?view.height:window.innerHeight,top=view?view.offsetTop:0;
-  if(Number.isFinite(height)&&height>0){dialog.style.setProperty('--edit-height',Math.max(160,Math.floor(height)-16)+'px');dialog.style.setProperty('--edit-top',(Math.round(top)+8)+'px');}
+  const view=window.visualViewport,height=view?view.height:window.innerHeight,width=view?view.width:window.innerWidth,top=view?view.offsetTop:0,left=view?view.offsetLeft:0;
+  for(const id of ['loginDialog','editDialog']){
+    const dialog=$(id);if(!dialog.open||!dialog.style||!Number.isFinite(height)||height<=0)continue;
+    const vars={'--form-height':Math.floor(height)+'px','--form-width':Math.floor(width)+'px','--form-top':Math.round(top)+'px','--form-left':Math.round(left)+'px'};
+    for(const [key,value] of Object.entries(vars))if(dialog.style.getPropertyValue(key)!==value)dialog.style.setProperty(key,value);
+  }
 }
 function queueEditViewport(){if(typeof requestAnimationFrame!=='function')return;cancelAnimationFrame(editViewportFrame);editViewportFrame=requestAnimationFrame(syncEditViewport);}
 window.visualViewport?.addEventListener('resize',queueEditViewport);
 window.visualViewport?.addEventListener('scroll',queueEditViewport);
 window.addEventListener('resize',queueEditViewport);
-$('editDialog').addEventListener('close',()=>{if(typeof cancelAnimationFrame==='function')cancelAnimationFrame(editViewportFrame);$('editDialog').style?.removeProperty('--edit-height');$('editDialog').style?.removeProperty('--edit-top');});
+for(const id of ['loginDialog','editDialog'])$(id).addEventListener('close',()=>{if(typeof cancelAnimationFrame==='function')cancelAnimationFrame(editViewportFrame);for(const key of ['--form-height','--form-width','--form-top','--form-left'])$(id).style?.removeProperty(key);});
 
 function openEdit(record=null){
   state.editing=record;diseaseChanged=false;$('editTitle').textContent=record?'แก้ไขข้อมูลผู้รับบริการ':'เพิ่มข้อมูลผู้รับบริการ';$('editError').textContent='';
@@ -346,7 +368,7 @@ document.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',
 ['editDialog','deleteDialog','loginDialog'].forEach(id=>$(id).addEventListener('cancel',e=>{if(state.busy)e.preventDefault();}));
 $('settingsBtn').onclick=()=>{$('urlInput').value=url||GAS_URL;$('settingsError').textContent='';$('settingsDialog').showModal();};
 $('settingsForm').onsubmit=async e=>{e.preventDefault();const target=$('urlInput').value.trim();if(!validUrl(target)){$('settingsError').textContent='URL ต้องเป็น https://script.google.com/macros/s/…/exec';return;}clearData();$('settingsDialog').close();try{localStorage.setItem('sleepClinicGasUrl',target);}catch{}try{await connect(target);await refresh();}catch(err){toast(err.message,true);}};
-$('loginBtn').onclick=async()=>{if(!validUrl(url)){$('settingsBtn').click();return;}$('loginError').textContent='';$('loginDialog').showModal();};
+$('loginBtn').onclick=async()=>{if(!validUrl(url)){$('settingsBtn').click();return;}$('loginError').textContent='';$('loginDialog').showModal();syncEditViewport();$('loginTitle').focus?.({preventScroll:true});};
 $('loginForm').onsubmit=async e=>{e.preventDefault();if(state.busy)return;state.busy=true;$('submitLogin').disabled=true;$('loginError').textContent='';try{const form=new FormData(e.target),r=await request('login',{username:form.get('username'),password:form.get('password')});state.token=r.token;sessionTimer=setTimeout(()=>{clearData();refresh().catch(e=>toast(e.message,true));},Math.max(0,r.expiresAt-Date.now()));$('loginForm').reset();$('loginDialog').close();$('loginBtn').hidden=true;$('logoutBtn').hidden=false;await refresh();}catch(err){if($('loginDialog').open)$('loginError').textContent=err.message;else toast(err.message,true);}finally{state.busy=false;$('submitLogin').disabled=false;}};
 $('logoutBtn').onclick=async()=>{const token=state.token;clearData();try{await request('logout',{token});}catch{}await refresh().catch(e=>toast(e.message,true));};
 $('refreshBtn').onclick=()=>refresh().catch(e=>toast(e.message,true));$('addBtn').onclick=()=>openEdit();
@@ -360,11 +382,20 @@ $('confirmDelete').onclick=async()=>{if(state.busy||!state.deleting)return;state
 let cpapRecord=null,cpapVersion=0,cpapBusy=false,cpapZip=null,cpapXml=null,cpapPreviewTimer;
 let cpapPreviewVersion=0,cpapPreviewPromise=Promise.resolve(),cpapDirty=false;
 const CPAP_LABELS={hn:'HN',name:'ชื่อ-สกุล',age:'อายุ (ปี)',phone:'เบอร์โทร',examDate:'วันที่ตรวจ (พ.ศ.)',coverage:'สิทธิการรักษา',diagnosis:'การวินิจฉัย / ผลตรวจ',mask:'ประเภทหน้ากาก / อื่น ๆ',doctor:'ชื่อแพทย์',patientDate:'วันที่ผู้ป่วยลงชื่อ',doctorDate:'วันที่แพทย์ลงชื่อ'};
+const CPAP_COVERAGES=['ชำระเงินเอง','เบิกตรง','รัฐวิสาหกิจ','อปท.','ครูเอกชน'];
+const CPAP_MASK_TYPES=['Nasal Mask','Full Face Mask','Pillow Mask','อื่นๆ'];
 const CPAP_DOCTORS=['รศ.นพ.ธีรกร ธีรกิตติกุล','แพทย์หญิงปิยาภา วงศ์หล้า'];
 function cpapFieldHtml(key,label,value){
+  if(key==='mask')return '';
+  if(key==='coverage')return '<label>'+esc(label)+'<select name="coverage"><option value="">เว้นว่าง / เลือกสิทธิการรักษา</option>'+CPAP_COVERAGES.map(name=>'<option value="'+esc(name)+'"'+(value===name?' selected':'')+'>'+esc(name)+'</option>').join('')+'</select></label>';
   if(key==='doctor')return '<label>'+esc(label)+'<select name="doctor"><option value="">เว้นว่าง / เลือกแพทย์</option>'+CPAP_DOCTORS.map(name=>'<option value="'+esc(name)+'"'+(value===name?' selected':'')+'>'+esc(name)+'</option>').join('')+'</select></label>';
   const isDate=['patientDate','doctorDate'].includes(key);
   return '<label>'+esc(label)+'<input name="'+key+'" type="'+(isDate?'date':'text')+'"'+(isDate?' lang="th"':' maxlength="500"')+' value="'+esc(value??'')+'"></label>';
+}
+function cpapItemFields(values){
+ const mask=String(values.mask||'').trim(),known=CPAP_MASK_TYPES.slice(0,3).find(type=>type.toLowerCase()===mask.toLowerCase()),selected=known||(mask?'อื่นๆ':'');
+ return '<fieldset class="choice-field wide"><legend>รายการ (เลือกได้มากกว่า 1 รายการ)</legend><div class="choice-list"><label class="choice"><input type="checkbox" name="itemMachine"><span>เครื่องอัดอากาศแรงดันบวก</span></label><label class="choice"><input type="checkbox" name="itemMask"'+(mask?' checked':'')+'><span>หน้ากาก</span></label></div></fieldset>'+
+ '<fieldset class="choice-field wide"><legend>ประเภทหน้ากาก</legend><div class="choice-list">'+CPAP_MASK_TYPES.map(type=>'<label class="choice"><input type="radio" name="maskType" value="'+esc(type)+'"'+(type===selected?' checked':'')+'><span>'+esc(type)+'</span></label>').join('')+'</div><button type="button" class="clear-choice" id="cpapClearMask">ล้างประเภทหน้ากาก</button><label>รายละเอียดหน้ากากอื่นๆ<input name="maskOther" maxlength="500" placeholder="ระบุเพิ่มเติมเมื่อเลือกอื่นๆ" value="'+esc(known?'':mask)+'"'+(selected==='อื่นๆ'?'':' disabled')+'></label></fieldset>';
 }
 function cpapOrderDate(value){const m=String(value||'').match(/^(\d{4})-(\d{2})-(\d{2})$/);return m?m[3]+'/'+m[2]+'/'+(Number(m[1])+543):String(value||'');}
 const CPAP_NS='http://schemas.openxmlformats.org/wordprocessingml/2006/main';
@@ -386,7 +417,7 @@ function cpapReplaceMatch(p,regex,value){const m=cpapText(p).match(regex);if(!m)
 const CPAP_FONT='TH SarabunPSK';
 function cpapFillTemplate(xml,values){
   const paragraphs=[...xml.getElementsByTagNameNS(CPAP_NS,'p')],found=new Set(),blank=' '.repeat(12);
-  const mask=String(values.mask||'').trim(),knownMask=/^(Nasal Mask|Full Face Mask|Pillow Mask)$/i.test(mask);
+  const mask=String(values.mask||'').trim(),knownMask=/^(Nasal Mask|Full Face Mask|Pillow Mask)$/i.test(mask),otherSelected=values.maskType==='อื่นๆ'||!Object.hasOwn(values,'maskType')&&!!mask&&!knownMask;
   paragraphs.forEach(p=>{
     const source=cpapText(p),matches=[...source.matchAll(/\{\{([a-zA-Z]+)\}\}/g)];
     // Work backwards across runs to preserve the reference's spaces, tabs,
@@ -397,14 +428,16 @@ function cpapFillTemplate(xml,values){
       if(key==='mask'&&knownMask)value='';cpapReplaceRange(p,m.index,m.index+m[0].length,value||blank);
     }
     const label=['Nasal Mask','Full Face Mask','Pillow Mask'].find(k=>source.includes(k));
-    if(label||/^อื่นๆ/.test(source.trim())){const symbols=[...p.getElementsByTagNameNS(CPAP_NS,'sym')],sym=symbols[symbols.length-1];if(sym)sym.setAttributeNS(CPAP_NS,'w:char',label&&mask.toLowerCase()===label.toLowerCase()||!label&&mask&&!knownMask?'F0FE':'F0A8');}
+    if(label||/^อื่นๆ/.test(source.trim())){const symbols=[...p.getElementsByTagNameNS(CPAP_NS,'sym')],sym=symbols[symbols.length-1];if(sym)sym.setAttributeNS(CPAP_NS,'w:char',label&&mask.toLowerCase()===label.toLowerCase()||!label&&otherSelected?'F0FE':'F0A8');}
+    const item=/รายการ/.test(source)&&/เครื่องอัดอากาศแรงดันบวก/.test(source)?'itemMachine':source.trim()==='หน้ากาก'?'itemMask':'';
+    if(item){const symbols=[...p.getElementsByTagNameNS(CPAP_NS,'sym')],sym=symbols[symbols.length-1];if(sym)sym.setAttributeNS(CPAP_NS,'w:char',values[item]?'F0FE':'F0A8');}
   });
   if(!Object.keys(CPAP_LABELS).every(k=>found.has(k)))throw new Error('แม่แบบไม่ครบ กรุณาใช้ assets/cpap/template-data.js เวอร์ชันล่าสุด');
   return paragraphs;
 }
 function cpapSaveBlob(blob,filename){const objectUrl=URL.createObjectURL(blob),a=document.createElement('a');a.href=objectUrl;a.download=filename;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(objectUrl),30000);}
 function cpapFilename(){const d=cpapRecord?.data||{};return ('ใบสั่งซื้อ CPAP '+(d.E||'')+' '+(d.C||'')+' '+new Date().toLocaleString('sv-SE',{timeZone:'Asia/Bangkok'}).replace(/[ :]/g,'-')).replace(/[\\/:*?"<>|]/g,'_')+'.docx';}
-function cpapCurrentValues(){return Object.fromEntries(new FormData($('cpapForm')));}
+function cpapCurrentValues(){const raw=new FormData($('cpapForm')),values=Object.fromEntries(raw);values.itemMachine=raw.has('itemMachine');values.itemMask=raw.has('itemMask');values.maskType=String(raw.get('maskType')||'');values.mask=values.maskType==='อื่นๆ'?String(raw.get('maskOther')||''):values.maskType;return values;}
 function cpapResetXml(){
   cpapXml=new DOMParser().parseFromString(cpapZip.originalXml,'application/xml');
   if(cpapXml.getElementsByTagName('parsererror').length)throw new Error('อ่านโครงสร้างแม่แบบ Word ไม่สำเร็จ');
@@ -444,7 +477,7 @@ async function openCpap(record){
     const originalXml=await zip.file('word/document.xml').async('string');
     if(version!==cpapVersion||!state.token||!$('cpapDialog').open)return;
     cpapZip={zip,originalXml};
-    $('cpapFields').innerHTML=Object.entries(CPAP_LABELS).map(([key,label])=>cpapFieldHtml(key,label,values[key])).join('');
+    $('cpapFields').innerHTML=Object.entries(CPAP_LABELS).map(([key,label])=>cpapFieldHtml(key,label,values[key])).join('')+cpapItemFields(values);
     cpapResetXml();await cpapRenderPreview();
     if(version===cpapVersion&&state.token)$('cpapWord').disabled=$('cpapPdf').disabled=false;
   }catch(e){if(version===cpapVersion&&state.token)$('cpapError').textContent=e.message;}
@@ -474,16 +507,21 @@ $('cpapForm').onsubmit=e=>e.preventDefault();
 $('cpapWord').onclick=()=>exportCpap('docx');$('cpapPdf').onclick=()=>exportCpap('pdf');
 $('cpapFields').addEventListener('input',e=>{
   if(!cpapXml)return;
-  const key=e.target.name,groups={hn:1,coverage:1,name:2,age:2,phone:3,examDate:3,diagnosis:5,mask:-1,doctor:15,patientDate:16,doctorDate:16};
+  const key=e.target.name;
+  if(key==='maskType'){const other=$('cpapForm').elements.namedItem('maskOther');other.disabled=e.target.value!=='อื่นๆ';$('cpapForm').elements.namedItem('itemMask').checked=true;}
+  if(key==='itemMask'&&!e.target.checked){$('cpapFields').querySelectorAll('input[name="maskType"]').forEach(input=>input.checked=false);$('cpapForm').elements.namedItem('maskOther').disabled=true;}
+  const groups={hn:1,coverage:1,name:2,age:2,phone:3,examDate:3,diagnosis:5,mask:-1,doctor:15,patientDate:16,doctorDate:16};
   const freshXml=new DOMParser().parseFromString(cpapZip.originalXml,'application/xml');cpapFillTemplate(freshXml,cpapCurrentValues());
   const fresh=[...freshXml.getElementsByTagNameNS(CPAP_NS,'p')],current=[...cpapXml.getElementsByTagNameNS(CPAP_NS,'p')];
-  const indices=key==='mask'?[7,8,9,10]:key==='name'?[2,15]:[groups[key]];
+  const indices=['maskType','maskOther','itemMask'].includes(key)?[6,7,8,9,10]:key==='itemMachine'?[5]:key==='name'?[2,15]:[groups[key]];
   indices.forEach(i=>{if(current[i]&&fresh[i])current[i].parentNode.replaceChild(cpapXml.importNode(fresh[i],true),current[i]);});
   cpapBuildTextEditor();cpapQueuePreview();
 });
 $('cpapTextEditor').addEventListener('input',e=>{const index=e.target.dataset.cpapParagraph;if(index===undefined||!cpapXml)return;const p=cpapXml.getElementsByTagNameNS(CPAP_NS,'p')[Number(index)];cpapReplaceRange(p,0,cpapText(p).length,e.target.value);cpapQueuePreview();});
 $('cpapDialog').addEventListener('cancel',e=>{if(cpapBusy)e.preventDefault();});
 $('cpapDialog').addEventListener('close',()=>{cpapVersion++;cpapPreviewVersion++;clearTimeout(cpapPreviewTimer);cpapRecord=null;cpapZip=null;cpapXml=null;$('cpapFields').replaceChildren();$('cpapTextEditor').replaceChildren();$('cpapPreview').replaceChildren();$('cpapError').textContent='';});
+
+$('cpapFields').addEventListener('click',e=>{if(e.target.id!=='cpapClearMask')return;const checked=$('cpapFields').querySelector('input[name="maskType"]:checked');if(checked){checked.checked=false;checked.dispatchEvent(new Event('input',{bubbles:true}));}$('cpapForm').elements.namedItem('maskOther').disabled=true;});
 
 try{url=GAS_URL||localStorage.getItem('sleepClinicGasUrl')||'';}catch{url=GAS_URL;}render();if(validUrl(url))connect(url).then(()=>refresh()).catch(e=>toast(e.message,true));
 </script>
